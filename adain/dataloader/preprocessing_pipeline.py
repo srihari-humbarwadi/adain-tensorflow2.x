@@ -21,17 +21,21 @@ class PreprocessingPipeline:
         return image, image_size, new_image_size, ratio
 
     def __call__(self, sample, return_labels=False):
+        image, image_size, new_image_size, ratio = self._resize_and_crop(image)
+
         if self.augmentation_params.horizontal_flip:
             image = tf.image.random_flip_left_right(sample["image"])
 
-        image, image_size, new_image_size, ratio = self._resize_and_crop(image)
+        if self.preprocessing_params.use_bgr:
+            image = image[:, :, ::-1]
 
         offset = tf.reshape(tf.constant(self.preprocessing_params.offset),
                             shape=[1, 1, 3])
         scale = tf.reshape(tf.constant(self.preprocessing_params.scale),
                            shape=[1, 1, 3])
-        image -= offset
-        image /= scale
+
+        image = tf.math.divide_no_nan(image - offset, scale)
+
         return {
             'image': image,
             'image_size': image_size,
