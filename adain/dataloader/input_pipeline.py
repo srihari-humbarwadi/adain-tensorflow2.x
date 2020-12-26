@@ -12,7 +12,7 @@ class InputPipeline:
         self.batch_size = params.training.batch_size
         self.tfrecord_files = params.dataloader_params.tfrecords[
             'train' if not is_validation_dataset else 'val']
-        self.preprocessing_pipeline = PreprocessingPipeline(params)
+        self.preprocessing_pipeline = PreprocessingPipeline(params, is_validation_dataset)
 
     def __call__(self, input_context=None):
         options = tf.data.Options()
@@ -60,6 +60,9 @@ class InputPipeline:
             num_parallel_calls=autotune)
 
         dataset = tf.data.Dataset.zip((style_dataset, content_dataset))
-        dataset = dataset.batch(batch_size=self.batch_size, drop_remainder=True)
+        
+        if not self.is_validation_dataset:
+            dataset = dataset.batch(batch_size=self.batch_size, drop_remainder=True)  # noqa: E501
+            
         dataset = dataset.prefetch(autotune)
         return dataset
