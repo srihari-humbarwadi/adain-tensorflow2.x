@@ -28,13 +28,13 @@
 ### TensorBoard
 ![tensorboard.png](/assets/images/tensorboard.png)
 
+
+
+</br>
+</br>
+</br>
+
 ```
-
-
-</br>
-</br>
-</br>
-
 
 @article{DBLP:journals/corr/HuangB17,
   author    = {Xun Huang and
