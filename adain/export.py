@@ -61,26 +61,27 @@ def main(_):
                       dtype=tf.float32),
         tf.TensorSpec(shape=[], name='alpha', dtype=tf.float32),
     )]
-    
+
     logging.debug('Signature for serving_default :\n{}'.format(
         input_signature))
-    
+
     inference_model._saved_model_inputs_spec = input_signature
 
     preprocessing_pipeline = PreprocessingPipeline(params=params,
                                                    is_validation_dataset=True)
-    
+
     @tf.function(input_signature=input_signature)
     def serving_fn(input_data):
         style_images, content_images, alpha = input_data
-        
+
         style_images = preprocessing_pipeline.inference_pipeline(style_images)
-        content_images = preprocessing_pipeline.inference_pipeline(content_images)
-        
+        content_images = preprocessing_pipeline.inference_pipeline(
+            content_images)
+
         generated_images = inference_model.call(
             (style_images, content_images, alpha),
             training=False)['synthesized_images']
-        
+
         generated_images = preprocessing_pipeline.denormalize(generated_images)
         return {'generated_images': generated_images}
 
@@ -90,6 +91,7 @@ def main(_):
         inference_model,
         FLAGS.export_dir,
         signatures={'serving_default': serving_fn.get_concrete_function()})  # noqa: E501
+
 
 if __name__ == '__main__':
     app.run(main)

@@ -3,8 +3,8 @@ import tensorflow as tf
 
 class InverseDecay(tf.optimizers.schedules.LearningRateSchedule):
     def __init__(self, initial_learning_rate, decay_rate):
-        super(InverseDecay,self).__init__()
-        
+        super(InverseDecay, self).__init__()
+
         self.initial_learning_rate = initial_learning_rate
         self.decay_rate = decay_rate
 

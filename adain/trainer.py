@@ -14,7 +14,7 @@ class Trainer:
         'train',
         'train_val',
         'export'
-    ]    
+    ]
 
     def __init__(self,
                  run_mode,
@@ -59,7 +59,7 @@ class Trainer:
             .format(Trainer._RUN_MODES)
 
         self._setup()
-        
+
         if 'train' in self.run_mode:
             self.train()
 
@@ -126,7 +126,7 @@ class Trainer:
             with tf.name_scope('metrics'):
                 for k in ['learning-rate', 'execution-time']:
                     v = loss_dict[k]
-                    tf.summary.scalar(k, data=v, step=step)                    
+                    tf.summary.scalar(k, data=v, step=step)
 
     def _train_step(self, data):
         style_images, content_images = data

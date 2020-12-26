@@ -8,7 +8,7 @@ class ReflectionPadding2D(tf.keras.layers.Layer):
 
         self.paddings = (
             (0, 0), (padding, padding), (padding, padding), (0, 0)
-            )
+        )
 
     def call(self, x):
         return tf.pad(x, paddings=self.paddings, mode='REFLECT')

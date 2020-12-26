@@ -55,14 +55,14 @@ class PreprocessingPipeline:
                             shape=[1, 1, 3])
         scale = tf.reshape(tf.constant(self.preprocessing_params.scale),
                            shape=[1, 1, 3])
-        
+
         image = image * scale + offset
 
         if self.preprocessing_params.use_bgr:
             image = image[:, :, ::-1]
-            
+
         image = tf.clip_by_value(image, 0, 255)
-        
+
         return tf.cast(tf.expand_dims(image, axis=0), dtype=tf.uint8)
 
     def __call__(self, sample, return_labels=False):
