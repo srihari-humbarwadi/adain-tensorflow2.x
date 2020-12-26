@@ -4,8 +4,8 @@
 ![1.png](/assets/images/1.png)
 ![2.png](/assets/images/2.png)
 
-#### Controlling Content-Style tradeoff
-These results are generating by varying alpha `[0.25, 0.5, 0.75, 1.0]`
+##### Controlling Content-Style tradeoff by varying alpha
+
 ![1_interpolation.png](/assets/images/1_interpolation.png)
 ![2_interpolation.png](/assets/images/2_interpolation.png)
 
