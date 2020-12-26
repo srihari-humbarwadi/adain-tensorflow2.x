@@ -52,7 +52,8 @@ def main(_):
     train_dataset_fn = InputPipeline(params, is_validation_dataset=False)
     val_train_dataset_fn = InputPipeline(params, is_validation_dataset=True)
 
-    trainer = Trainer(strategy=strategy,  # noqa: F841
+    trainer = Trainer(run_mode='train',  # noqa: F841
+                      strategy=strategy,
                       model_fn=model_builder(params),
                       train_input_fn=train_dataset_fn,
                       val_input_fn=val_train_dataset_fn,

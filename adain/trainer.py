@@ -10,7 +10,14 @@ from adain.viz_utils import prepare_visualization_image
 
 class Trainer:
 
+    _RUN_MODES = [
+        'train',
+        'train_val',
+        'export'
+    ]    
+
     def __init__(self,
+                 run_mode,
                  strategy,
                  model_fn,
                  style_loss_weight=10.0,
@@ -26,6 +33,7 @@ class Trainer:
                  restore_checkpoint=True,
                  summary_dir='tensorboard',
                  name=None):
+        self.run_mode = run_mode
         self.distribute_strategy = strategy
         self.model_fn = model_fn
         self.train_input_fn = train_input_fn
@@ -45,8 +53,15 @@ class Trainer:
         self.training_alpha = tf.constant(1.0, dtype=tf.float32)
         self.style_loss_weight = tf.constant(style_loss_weight,
                                              dtype=tf.float32)
+
+        assert self.run_mode in Trainer._RUN_MODES, \
+            'Invalid run mode, aborting!\n Supported run modes {}' \
+            .format(Trainer._RUN_MODES)
+
         self._setup()
-        self.train()
+        
+        if 'train' in self.run_mode:
+            self.train()
 
     def _setup_model(self):
         logging.info('Setting up model')
@@ -57,12 +72,13 @@ class Trainer:
             self.use_float16 = True
 
     def _setup_dataset(self):
-        logging.info('Setting up train dataset')
-        self._train_dataset = \
-            self.distribute_strategy.experimental_distribute_dataset(
-                self.train_input_fn())
+        if 'train' in self.run_mode:
+            logging.info('Setting up train dataset')
+            self._train_dataset = \
+                self.distribute_strategy.experimental_distribute_dataset(
+                    self.train_input_fn())
 
-        if self.val_input_fn:
+        if 'val' in self.run_mode:
             logging.info('Setting up val dataset')
             self._val_dataset = self.val_input_fn()
 
@@ -213,7 +229,7 @@ class Trainer:
                     current_step, self.train_steps, eta, images_per_second,
                     {k: np.round(v, 3) for k, v in loss_dict.items()}))
 
-            if current_step % self.val_freq == 0:
+            if (current_step % self.val_freq == 0) and ('val' in self.run_mode):
                 logging.info('Generating outputs with validation images')
 
                 visualization_image = []
