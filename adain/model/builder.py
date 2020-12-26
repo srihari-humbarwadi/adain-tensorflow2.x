@@ -1,10 +1,7 @@
-import re
-
 import tensorflow as tf
 from absl import logging
 
 from adain.model import StyleTransferNetwork
-
 
 
 def get_optimizer(name):
@@ -21,9 +18,9 @@ def model_builder(params):
 
         logging.info('Trainable weights: {}'.format(
             len(model.trainable_weights)))
-        
+
         optimizer = get_optimizer(params.training.optimizer.name)(
-                learning_rate=params.training.optimizer.learning_rate)
+            learning_rate=params.training.optimizer.learning_rate)
 
         if params.floatx.precision == 'mixed_float16':
             logging.info(

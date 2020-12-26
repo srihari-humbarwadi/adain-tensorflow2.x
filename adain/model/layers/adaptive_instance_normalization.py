@@ -10,10 +10,10 @@ class AdaptiveInstanceNormalization(tf.keras.layers.Layer):
 
     def call(self, inputs):
         style_features, content_features = inputs
-        
+
         style_features = tf.cast(style_features, dtype=tf.float32)
         content_features = tf.cast(content_features, dtype=tf.float32)
-        
+
         style_mean, style_variance = \
             tf.nn.moments(style_features, axes=[1, 2], keepdims=True)
         content_mean, content_variance = \

@@ -7,6 +7,7 @@ from absl import logging
 
 from adain.viz_utils import prepare_visualization_image
 
+
 class Trainer:
 
     def __init__(self,
@@ -208,22 +209,22 @@ class Trainer:
 
             if current_step % self.val_freq == 0:
                 logging.info('Generating outputs with validation images')
-                
+
                 visualization_image = []
-                
+
                 for idx, (style_image, content_image) in enumerate(
                         self._val_dataset.take(self.val_steps)):
 
                     generated_image = self._model(
                         (style_image['image'][None, ...],
-                         content_image['image'][None,...],
+                         content_image['image'][None, ...],
                          self.training_alpha),
                         training=False)['synthesized_images'][0]
 
                     visualization_image += [prepare_visualization_image(
                         style_image['image'], content_image['image'],
                         generated_image)]
-                        
+
                 visualization_image = tf.concat(visualization_image, axis=1)
                 with self._summary_writer.as_default():
                     tf.summary.image('Generated Images',

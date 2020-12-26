@@ -20,31 +20,31 @@ class PreprocessingPipeline:
             image, size=[self.input_shape[0], self.input_shape[1], 3])
 
         return image, image_size, new_image_size, ratio
-    
+
     def _resize(self, image):
         image_size = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
         max_side = tf.maximum(image_size[0], image_size[1])
 
-        if  max_side > self.augmentation_params.max_side:
+        if max_side > self.augmentation_params.max_side:
             ratio = self.augmentation_params.max_side / max_side
             new_image_size = tf.cast(image_size * ratio, dtype=tf.int32)
             image = tf.image.resize(image, size=new_image_size)
-            
+
         else:
             ratio = 1.0
             new_image_size = tf.cast(image_size, dtype=tf.int32)
 
-        return image, image_size, new_image_size, ratio        
+        return image, image_size, new_image_size, ratio
 
     def __call__(self, sample, return_labels=False):
         image = sample["image"]
-        
+
         if not self.is_validation_dataset:
             image, image_size, new_image_size, ratio = \
                 self._resize_and_crop(image)
         else:
             image, image_size, new_image_size, ratio = \
-                            self._resize(image)            
+                self._resize(image)
 
         if self.augmentation_params.horizontal_flip and (not self.is_validation_dataset):  # noqa: E501
             image = tf.image.random_flip_left_right(image)

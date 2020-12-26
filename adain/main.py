@@ -52,8 +52,6 @@ def main(_):
     train_dataset_fn = InputPipeline(params, is_validation_dataset=False)
     val_train_dataset_fn = InputPipeline(params, is_validation_dataset=True)
 
-    model_fn = model_builder(params)
-
     trainer = Trainer(strategy=strategy,  # noqa: F841
                       model_fn=model_builder(params),
                       train_input_fn=train_dataset_fn,
@@ -68,6 +66,7 @@ def main(_):
                       restore_checkpoint=params.training.restore_checkpoint,
                       summary_dir=params.experiment.tensorboard_dir,
                       name=params.experiment.name)
+
 
 if __name__ == '__main__':
     app.run(main)

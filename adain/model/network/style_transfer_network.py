@@ -2,7 +2,7 @@ import functools
 
 import tensorflow as tf
 
-from adain.model.layers import AdaptiveInstanceNormalization, ReflectionPadding2D
+from adain.model.layers import AdaptiveInstanceNormalization, ReflectionPadding2D  # noqa E501
 
 
 class StyleTransferNetwork(tf.keras.Model):
@@ -94,7 +94,7 @@ class StyleTransferNetwork(tf.keras.Model):
     def call(self, x, training=False):
         style_images, content_images, alpha = x
         alpha = tf.cast(alpha, dtype=tf.float32)
-        
+
         # f(s) and f(c)
         style_features = self.encoder(style_images)
         content_features = self.encoder(content_images)
@@ -106,22 +106,21 @@ class StyleTransferNetwork(tf.keras.Model):
         normalized_features = \
             alpha * normalized_features + (1 - alpha) * content_features['block4_conv1']  # noqa: E501
 
-
         # T(c, s) = g(t)
         synthesized_images = self.decoder(normalized_features)
         synthesized_images = tf.cast(synthesized_images, dtype=tf.float32)
-        
+
         if not training:
             return {'synthesized_images': synthesized_images}
 
-        synthesized_features =self.encoder(synthesized_images)
+        synthesized_features = self.encoder(synthesized_images)
 
         content_loss = StyleTransferNetwork._compute_content_loss(
             synthesized_features, normalized_features)
-        
+
         style_loss = StyleTransferNetwork._compute_style_loss(
             synthesized_features, style_features)
-        
+
         return {
             'content-loss': content_loss,
             'style-loss': style_loss
@@ -139,8 +138,8 @@ class StyleTransferNetwork(tf.keras.Model):
             style_features_std = tf.sqrt(style_features_variance +
                                          tf.keras.backend.epsilon())
 
-            synthesized_features_mean, synthesized_features_variance = tf.nn.moments(
-                synthesized_features[level], axes=[1, 2])
+            synthesized_features_mean, synthesized_features_variance = \
+                tf.nn.moments(synthesized_features[level], axes=[1, 2])
             synthesized_features_std = tf.sqrt(synthesized_features_variance +
                                                tf.keras.backend.epsilon())
 

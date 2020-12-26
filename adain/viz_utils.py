@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
+
 def renormalize(image):
     image = (image + [103.939, 116.779, 123.68])[:, :, ::-1]
     return np.uint8(np.clip(image, 0, 255))
