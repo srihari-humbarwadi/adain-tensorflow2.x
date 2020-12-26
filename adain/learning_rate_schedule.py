@@ -1,10 +1,10 @@
 import tensorflow as tf
 
 
-class InverseDecay(tf.keras.optimizers.Optimizer):
-    def __init__(self, initial_learning_rate, decay_rate, **kwargs):
-        super(InverseDecay,
-              self).__init__(name='InverseDecay', **kwargs)
+class InverseDecay(tf.optimizers.schedules.LearningRateSchedule):
+    def __init__(self, initial_learning_rate, decay_rate):
+        super(InverseDecay,self).__init__()
+        
         self.initial_learning_rate = initial_learning_rate
         self.decay_rate = decay_rate
 
