@@ -9,7 +9,7 @@
  python -m adain.dataset_utils.create_tfrecords --image_paths_pattern wikiart/train/* --prefix wikiart-train  --output_dir tfrecords
  ```
   - Start training with `python -m adain.main --config_path configs/coco-wikiart.json`
-  - To, export `saved_model`, use `python -m adain.export --config_path configs/coco-wikiart.json`. The `saved_model` artifacts will be avaiable at `./export`
+  - To export `saved_model`, use `python -m adain.export --config_path configs/coco-wikiart.json`. The `saved_model` artifacts will be avaiable at `./export`
   
 ### Results
 ![1.png](/assets/images/1.png)
