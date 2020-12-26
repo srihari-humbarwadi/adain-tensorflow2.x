@@ -1,6 +1,7 @@
 import tensorflow as tf
 from absl import logging
 
+from adain.learning_rate_schedule import InverseDecay
 from adain.model import StyleTransferNetwork
 
 
@@ -19,8 +20,13 @@ def model_builder(params):
         logging.info('Trainable weights: {}'.format(
             len(model.trainable_weights)))
 
+        learning_rate_params = params.training.optimizer.learning_rate
+        learning_rate_fn = InverseDecay(
+            learning_rate_params.initial_learning_rate,
+            learning_rate_params.decay_rate)
+
         optimizer = get_optimizer(params.training.optimizer.name)(
-            learning_rate=params.training.optimizer.learning_rate)
+            learning_rate=learning_rate_fn)
 
         if params.floatx.precision == 'mixed_float16':
             logging.info(
