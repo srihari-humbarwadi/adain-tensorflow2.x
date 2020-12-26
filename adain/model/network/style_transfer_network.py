@@ -2,7 +2,8 @@ import functools
 
 import tensorflow as tf
 
-from adain.model.layers import AdaptiveInstanceNormalization, ReflectionPadding2D  # noqa E501
+from adain.model.layers import AdaptiveInstanceNormalization  # noqa E501
+from adain.model.layers import ReflectionPadding2D
 
 
 class StyleTransferNetwork(tf.keras.Model):

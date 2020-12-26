@@ -4,6 +4,7 @@ from random import shuffle
 
 import tensorflow as tf
 from absl import app, flags, logging
+
 from adain.dataset_utils.tfrecord_writer import TFrecordWriter
 
 flags.DEFINE_string('image_paths_pattern',

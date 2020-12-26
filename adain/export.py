@@ -2,10 +2,9 @@ import tensorflow as tf
 from absl import app, flags, logging
 
 from adain.cfg import Config
+from adain.dataloader.preprocessing_pipeline import PreprocessingPipeline
 from adain.model import model_builder
 from adain.trainer import Trainer
-from adain.dataloader.preprocessing_pipeline import PreprocessingPipeline
-
 
 tf.get_logger().propagate = False
 tf.config.set_soft_device_placement(True)
