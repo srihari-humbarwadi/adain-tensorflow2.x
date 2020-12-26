@@ -101,10 +101,16 @@ class Trainer:
     @tf.function
     def _write_summaries(self, loss_dict, step):
         with self._summary_writer.as_default():
+
             with tf.name_scope('losses'):
                 for k in ['content-loss', 'style-loss', 'total-loss']:
                     v = loss_dict[k]
                     tf.summary.scalar(k, data=v, step=step)
+
+            with tf.name_scope('metrics'):
+                for k in ['learning-rate', 'execution-time']:
+                    v = loss_dict[k]
+                    tf.summary.scalar(k, data=v, step=step)                    
 
     def _train_step(self, data):
         style_images, content_images = data
