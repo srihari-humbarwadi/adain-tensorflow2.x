@@ -4,6 +4,8 @@ from absl import app, flags, logging
 from adain.cfg import Config
 from adain.model import model_builder
 from adain.trainer import Trainer
+from adain.dataloader.preprocessing_pipeline import PreprocessingPipeline
+
 
 tf.get_logger().propagate = False
 tf.config.set_soft_device_placement(True)
@@ -44,17 +46,17 @@ def main(_):
                       name=params.experiment.name)
 
     inference_model = trainer.model
-    inference_model.build([(None, None, None, 3), (None, None, None, 3), ()])
+    inference_model.build([(1, None, None, 3), (1, None, None, 3), ()])
     inference_model.optimizer = None
     inference_model.compiled_loss = None
     inference_model.compiled_metrics = None
     inference_model._metrics = []
 
     input_signature = [(
-        tf.TensorSpec(shape=[None, None, None, 3],
+        tf.TensorSpec(shape=[1, None, None, 3],
                       name='style_images',
                       dtype=tf.float32),
-        tf.TensorSpec(shape=[None, None, None, 3],
+        tf.TensorSpec(shape=[1, None, None, 3],
                       name='content_images',
                       dtype=tf.float32),
         tf.TensorSpec(shape=[], name='alpha', dtype=tf.float32),
@@ -65,14 +67,21 @@ def main(_):
     
     inference_model._saved_model_inputs_spec = input_signature
 
+    preprocessing_pipeline = PreprocessingPipeline(params=params,
+                                                   is_validation_dataset=True)
+    
     @tf.function(input_signature=input_signature)
     def serving_fn(input_data):
         style_images, content_images, alpha = input_data
-
+        
+        style_images = preprocessing_pipeline.inference_pipeline(style_images)
+        content_images = preprocessing_pipeline.inference_pipeline(content_images)
+        
         generated_images = inference_model.call(
             (style_images, content_images, alpha),
             training=False)['synthesized_images']
-
+        
+        generated_images = preprocessing_pipeline.denormalize(generated_images)
         return {'generated_images': generated_images}
 
     logging.info('Exporting `saved_model` to {}'.format(FLAGS.export_dir))
