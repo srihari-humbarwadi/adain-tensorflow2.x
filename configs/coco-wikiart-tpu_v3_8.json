@@ -11,7 +11,7 @@
         ]
     },
     "floatx": {
-        "precision": "float32"
+        "precision": "mixed_bfloat16"
     },
     "training": {
         "batch_size": 8,
@@ -54,14 +54,14 @@
         "preprocessing": {
             "use_bgr": true,
             "offset": [
-                0.0,
-                0.0,
-                0.0
+                103.939,
+                116.779,
+                123.68
             ],
             "scale": [
-                255.0,
-                255.0,
-                255.0
+                1.0,
+                1.0,
+                1.0
             ]
         }
     }
