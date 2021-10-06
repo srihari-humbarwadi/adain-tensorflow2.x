@@ -29,7 +29,7 @@
             "name": "adam",
             "learning_rate": {
                 "initial_learning_rate": 1e-4,
-                "decay_rate": 1e-5
+                "decay_rate": 5e-5
             }
         }
     },
