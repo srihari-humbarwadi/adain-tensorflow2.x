@@ -6,6 +6,32 @@ from adain.model.layers import AdaptiveInstanceNormalization  # noqa E501
 from adain.model.layers import ReflectionPadding2D
 
 
+def get_vgg_model():
+    vgg_old = tf.keras.applications.VGG19(
+        input_shape=[None, None, 3],
+        weights='imagenet',
+        include_top=False)
+
+    images = tf.keras.Input(shape=[None, None, 3])
+    x = images
+
+    for layer in vgg_old.layers[1:]:
+        config = layer.get_config()
+        if isinstance(layer, tf.keras.layers.Conv2D):
+            assert config['padding'] == 'same'
+            config['padding'] = 'valid'
+            x = ReflectionPadding2D(padding=1)(x)
+
+        new_layer = layer.__class__.from_config(config)
+        x = new_layer(x)
+
+    vgg_model = tf.keras.Model(inputs=[images], outputs=[x])
+    vgg_model.set_weights(vgg_old.get_weights())
+    del vgg_old
+
+    return vgg_model
+
+
 class StyleTransferNetwork(tf.keras.Model):
     _ENCODING_LAYERS = [
         'block1_conv1', 'block2_conv1', 'block3_conv1', 'block4_conv1'
@@ -21,9 +47,7 @@ class StyleTransferNetwork(tf.keras.Model):
 
     @staticmethod
     def _build_encoder():
-        base_model = tf.keras.applications.VGG19(input_shape=[None, None, 3],
-                                                 weights='imagenet',
-                                                 include_top=False)
+        base_model = get_vgg_model()
         encoder = tf.keras.Model(
             inputs=base_model.inputs,
             outputs={
