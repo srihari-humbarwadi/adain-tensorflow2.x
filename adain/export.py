@@ -33,6 +33,8 @@ def main(_):
                       model_fn=model_builder(params),
                       train_input_fn=None,
                       val_input_fn=None,
+                      style_loss_weight=params.training.style_loss_weight,
+                      content_loss_weight=params.training.content_loss_weight,
                       train_steps=params.training.train_steps,
                       val_steps=params.training.validation_steps,
                       val_freq=params.training.validation_freq,
