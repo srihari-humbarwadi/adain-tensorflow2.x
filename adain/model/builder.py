@@ -2,7 +2,7 @@ import tensorflow as tf
 from absl import logging
 
 from adain.learning_rate_schedule import InverseDecay
-from adain.model import StyleTransferNetwork
+from adain.model.network.style_transfer_network import StyleTransferNetwork
 
 
 def get_optimizer(name):
