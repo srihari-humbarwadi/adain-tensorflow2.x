@@ -20,7 +20,8 @@ class Trainer:
                  run_mode,
                  strategy,
                  model_fn,
-                 style_loss_weight=10.0,
+                 style_loss_weight,
+                 content_loss_weight,
                  train_input_fn=None,
                  val_input_fn=None,
                  train_steps=None,
@@ -53,6 +54,8 @@ class Trainer:
         self.training_alpha = tf.constant(1.0, dtype=tf.float32)
         self.style_loss_weight = tf.constant(style_loss_weight,
                                              dtype=tf.float32)
+        self.content_loss_weight = tf.constant(content_loss_weight,
+                                               dtype=tf.float32)
 
         assert self.run_mode in Trainer._RUN_MODES, \
             'Invalid run mode, aborting!\n Supported run modes {}' \
@@ -136,8 +139,12 @@ class Trainer:
             loss = self._model(training_input, training=True)
             style_loss_weight = tf.cast(self.style_loss_weight,
                                         dtype=loss['content-loss'].dtype)
-            loss['total-loss'] = loss[
-                'content-loss'] + style_loss_weight * loss['style-loss']
+            content_loss_weight = tf.cast(self.content_loss_weight,
+                                          dtype=loss['content-loss'].dtype)
+            loss['total-loss'] = (
+                content_loss_weight * loss['content-loss'] +
+                style_loss_weight * loss['style-loss'])
+
             per_replica_loss = loss[
                 'total-loss'] / self.distribute_strategy.num_replicas_in_sync
             if self.use_float16:

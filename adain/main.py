@@ -55,6 +55,8 @@ def main(_):
     trainer = Trainer(run_mode='train',  # noqa: F841
                       strategy=strategy,
                       model_fn=model_builder(params),
+                      style_loss_weight=params.training.style_loss_weight,
+                      content_loss_weight=params.training.content_loss_weight,
                       train_input_fn=train_dataset_fn,
                       val_input_fn=val_train_dataset_fn,
                       train_steps=params.training.train_steps,
