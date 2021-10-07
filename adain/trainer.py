@@ -136,7 +136,8 @@ class Trainer:
         training_input = (style_images['image'], content_images['image'],
                           self.training_alpha)
         with tf.GradientTape() as tape:
-            loss = self._model(training_input, training=True)
+            outputs = self._model(training_input, training=True)
+            loss = outputs['loss']
             style_loss_weight = tf.cast(self.style_loss_weight,
                                         dtype=loss['content-loss'].dtype)
             content_loss_weight = tf.cast(self.content_loss_weight,

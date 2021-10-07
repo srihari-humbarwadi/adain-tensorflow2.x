@@ -154,8 +154,11 @@ class StyleTransferNetwork(tf.keras.Model):
             synthesized_features, style_features)
 
         return {
-            'content-loss': content_loss,
-            'style-loss': style_loss
+            'synthesized_images': synthesized_images,
+            'loss': {
+                'content-loss': content_loss,
+                'style-loss': style_loss
+            }
         }
 
     def _compute_content_loss(synthesized_features, normalized_features):
