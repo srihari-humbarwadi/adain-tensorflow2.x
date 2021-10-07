@@ -15,7 +15,8 @@ def get_optimizer(name):
 
 def model_builder(params):
     def _model_fn():
-        model = StyleTransferNetwork()
+        model = StyleTransferNetwork(
+            encoder_weights=params.training.encoder_weights)
 
         logging.info('Trainable weights: {}'.format(
             len(model.trainable_weights)))

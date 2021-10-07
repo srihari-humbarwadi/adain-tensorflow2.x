@@ -1,5 +1,6 @@
 import functools
 
+from absl import logging
 import tensorflow as tf
 
 from adain.model.layers import AdaptiveInstanceNormalization  # noqa E501
@@ -9,7 +10,7 @@ from adain.model.layers import ReflectionPadding2D
 def get_vgg_model():
     vgg_old = tf.keras.applications.VGG19(
         input_shape=[None, None, 3],
-        weights='imagenet',
+        weights=None,
         include_top=False)
 
     images = tf.keras.Input(shape=[None, None, 3])
@@ -38,16 +39,22 @@ class StyleTransferNetwork(tf.keras.Model):
     ]
     _MSE_LOSS = tf.losses.MeanSquaredError(reduction='none')
 
-    def __init__(self, **kwargs):
+    def __init__(self, encoder_weights, **kwargs):
         super(StyleTransferNetwork, self).__init__(**kwargs)
 
-        self.encoder = StyleTransferNetwork._build_encoder()
+        self.encoder_weights = encoder_weights
+        self.encoder = StyleTransferNetwork._build_encoder(encoder_weights)
         self.decoder = StyleTransferNetwork._build_decoder()
         self.adain = AdaptiveInstanceNormalization()
 
     @staticmethod
-    def _build_encoder():
+    def _build_encoder(encoder_weights):
         base_model = get_vgg_model()
+        base_model.load_weights(encoder_weights)
+
+        logging.info('Initialized encoder with weights from {}'.format(
+            encoder_weights))
+
         encoder = tf.keras.Model(
             inputs=base_model.inputs,
             outputs={
