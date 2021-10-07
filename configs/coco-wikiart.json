@@ -27,6 +27,7 @@
         "save_every": 4000,
         "style_loss_weight": 1e-2,
         "content_loss_weight": 1.0,
+        "encoder_weights": "normalized_vgg19.h5",
         "optimizer": {
             "name": "adam",
             "learning_rate": {
