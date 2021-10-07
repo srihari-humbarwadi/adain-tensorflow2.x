@@ -11,18 +11,19 @@ class AdaptiveInstanceNormalization(tf.keras.layers.Layer):
     def call(self, inputs):
         style_features, content_features = inputs
 
+        style_features = tf.cast(style_features, dtype=tf.float32)
+        content_features = tf.cast(content_features, dtype=tf.float32)
+
         style_mean, style_variance = \
             tf.nn.moments(style_features, axes=[1, 2], keepdims=True)
         content_mean, content_variance = \
             tf.nn.moments(content_features, axes=[1, 2], keepdims=True)
+        style_std = tf.sqrt(style_variance + self.epsilon)
+        content_std = tf.sqrt(content_variance + self.epsilon)
 
-        output = tf.nn.batch_normalization(
-            x=content_features,
-            mean=content_mean,
-            variance=content_variance,
-            offset=style_mean,
-            scale=tf.sqrt(style_variance),
-            variance_epsilon=self.epsilon)
+        normalized_content_features = tf.math.divide_no_nan(
+            content_features - content_mean, content_std)
+        output = style_std * normalized_content_features + style_mean
         return output
 
     def get_config(self):
