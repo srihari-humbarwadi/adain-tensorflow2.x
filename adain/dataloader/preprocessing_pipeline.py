@@ -13,7 +13,7 @@ class PreprocessingPipeline:
         image_size = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
         ratio = self.augmentation_params.min_side / tf.minimum(
             image_size[0], image_size[1])
-        new_image_size = tf.cast(image_size * ratio, dtype=tf.int32)
+        new_image_size = tf.cast(tf.round(image_size * ratio), dtype=tf.int32)
 
         image = tf.image.resize(image, size=new_image_size)
         image = tf.image.random_crop(
@@ -25,7 +25,7 @@ class PreprocessingPipeline:
         image_size = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
         ratio = self.augmentation_params.min_side / tf.minimum(
             image_size[0], image_size[1])
-        new_image_size = tf.cast(image_size * ratio, dtype=tf.int32)
+        new_image_size = tf.cast(tf.round(image_size * ratio), dtype=tf.int32)
         image = tf.image.resize(image, size=new_image_size)
         return image, image_size, new_image_size, ratio
 
