@@ -16,8 +16,8 @@
     "training": {
         "batch_size": 8,
         "strategy": {
-          "type": "gpu",
-          "name": ""
+          "type": "tpu",
+          "name": "local"
         },
         "restore_checkpoint": true,
         "train_steps": 160000,
