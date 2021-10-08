@@ -31,7 +31,6 @@ def get_vgg_model(preprocessing_params):
         x = new_layer(x)
 
     vgg_model = tf.keras.Model(inputs=[images], outputs=[x])
-    vgg_model.set_weights(vgg_old.get_weights())
     del vgg_old
 
     return vgg_model
