@@ -14,12 +14,11 @@ def get_vgg_model(preprocessing_params):
         include_top=False)
 
     images = tf.keras.Input(shape=[None, None, 3])
-    images = images[:, :, :, ::-1]
     offset = tf.reshape(tf.constant(preprocessing_params.offset),
                         shape=[1, 1, 1, 3])
     scale = tf.reshape(tf.constant(preprocessing_params.scale),
                        shape=[1, 1, 1, 3])
-    x = tf.math.divide_no_nan(images - offset, scale)
+    x = (images[:, :, :, ::-1] - offset) / scale
 
     for layer in vgg_old.layers[1:]:
         config = layer.get_config()
