@@ -4,16 +4,12 @@ import tensorflow as tf
 class AdaptiveInstanceNormalization(tf.keras.layers.Layer):
 
     def __init__(self, **kwargs):
-        self.epsilon = kwargs.pop('epsilon', tf.keras.backend.epsilon())
+        self.epsilon = 1e-5
         super(AdaptiveInstanceNormalization, self).__init__(
             dtype=tf.float32, **kwargs)
 
     def call(self, inputs):
         style_features, content_features = inputs
-
-        style_features = tf.cast(style_features, dtype=tf.float32)
-        content_features = tf.cast(content_features, dtype=tf.float32)
-
         style_mean, style_variance = \
             tf.nn.moments(style_features, axes=[1, 2], keepdims=True)
         content_mean, content_variance = \
@@ -21,8 +17,8 @@ class AdaptiveInstanceNormalization(tf.keras.layers.Layer):
         style_std = tf.sqrt(style_variance + self.epsilon)
         content_std = tf.sqrt(content_variance + self.epsilon)
 
-        normalized_content_features = tf.math.divide_no_nan(
-            content_features - content_mean, content_std)
+        normalized_content_features = (
+            content_features - content_mean) / content_std
         output = style_std * normalized_content_features + style_mean
         return output
 

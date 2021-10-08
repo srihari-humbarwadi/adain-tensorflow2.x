@@ -41,7 +41,6 @@ class StyleTransferNetwork(tf.keras.Model):
     _ENCODING_LAYERS = [
         'block1_conv1', 'block2_conv1', 'block3_conv1', 'block4_conv1'
     ]
-    _MSE_LOSS = tf.losses.MeanSquaredError(reduction='none')
 
     def __init__(self, preprocessing_params, encoder_weights, **kwargs):
         super(StyleTransferNetwork, self).__init__(**kwargs)
@@ -165,25 +164,30 @@ class StyleTransferNetwork(tf.keras.Model):
         }
 
     def _compute_content_loss(synthesized_features, normalized_features):
-        return tf.reduce_mean(StyleTransferNetwork._MSE_LOSS(
+        return tf.reduce_mean(tf.math.squared_difference(
             synthesized_features['block4_conv1'], normalized_features))
 
-    def _compute_style_loss(synthesized_features, style_features):
-        style_loss = 0
+    def _compute_style_loss(synthesized_features, style_features, epsilon=1e-6):
+        style_loss = []
         for level in StyleTransferNetwork._ENCODING_LAYERS:
             style_features_mean, style_features_variance = tf.nn.moments(
                 style_features[level], axes=[1, 2])
-            style_features_std = tf.sqrt(style_features_variance +
-                                         tf.keras.backend.epsilon())
-
             synthesized_features_mean, synthesized_features_variance = \
                 tf.nn.moments(synthesized_features[level], axes=[1, 2])
-            synthesized_features_std = tf.sqrt(synthesized_features_variance +
-                                               tf.keras.backend.epsilon())
 
-            loss_mu = tf.reduce_mean(StyleTransferNetwork._MSE_LOSS(
-                synthesized_features_mean, style_features_mean))
-            loss_sigma = tf.reduce_mean(StyleTransferNetwork._MSE_LOSS(
-                synthesized_features_std, style_features_std))
-            style_loss += (loss_mu + loss_sigma)
-        return style_loss
+            style_features_std = tf.sqrt(
+                style_features_variance + epsilon)
+            synthesized_features_std = tf.sqrt(
+                synthesized_features_variance + epsilon)
+
+            batch_size = tf.cast(
+                tf.shape(synthesized_features_mean)[0],
+                dtype=synthesized_features_mean.dtype)
+
+            loss_mu = tf.reduce_sum(tf.math.squared_difference(
+                synthesized_features_mean, style_features_mean)) / batch_size
+            loss_sigma = tf.reduce_sum(tf.math.squared_difference(
+                synthesized_features_std, style_features_std)) / batch_size
+
+            style_loss += [loss_mu + loss_sigma]
+        return tf.math.add_n(style_loss)
