@@ -5,7 +5,6 @@ class PreprocessingPipeline:
 
     def __init__(self, params, is_validation_dataset):
         self.input_shape = params.input.input_shape
-        self.preprocessing_params = params.dataloader_params.preprocessing
         self.augmentation_params = params.dataloader_params.augmentations
         self.is_validation_dataset = is_validation_dataset
 
@@ -31,15 +30,6 @@ class PreprocessingPipeline:
 
     def inference_pipeline(self, images):
         image, image_size, new_image_size, ratio = self._resize(images[0])
-        offset = tf.reshape(tf.constant(self.preprocessing_params.offset),
-                            shape=[1, 1, 3])
-        scale = tf.reshape(tf.constant(self.preprocessing_params.scale),
-                           shape=[1, 1, 3])
-
-        if self.preprocessing_params.use_bgr:
-            image = image[:, :, ::-1]
-
-        image = tf.math.divide_no_nan(image - offset, scale)
         return tf.expand_dims(image, axis=0)
 
     def denormalize(self, images):
@@ -49,9 +39,6 @@ class PreprocessingPipeline:
 
         images = 255.0 * (images - pixel_mins) / pixel_range
         images = tf.clip_by_value(images, 0, 255)
-
-        if self.preprocessing_params.use_bgr:
-            images = images[:, :, :, ::-1]
 
         return tf.cast(images, dtype=tf.uint8)
 
@@ -67,16 +54,6 @@ class PreprocessingPipeline:
 
         if self.augmentation_params.horizontal_flip and (not self.is_validation_dataset):  # noqa: E501
             image = tf.image.random_flip_left_right(image)
-
-        if self.preprocessing_params.use_bgr:
-            image = image[:, :, ::-1]
-
-        offset = tf.reshape(tf.constant(self.preprocessing_params.offset),
-                            shape=[1, 1, 3])
-        scale = tf.reshape(tf.constant(self.preprocessing_params.scale),
-                           shape=[1, 1, 3])
-
-        image = tf.math.divide_no_nan(image - offset, scale)
 
         return {
             'image': image,

@@ -7,14 +7,19 @@ from adain.model.layers import AdaptiveInstanceNormalization  # noqa E501
 from adain.model.layers import ReflectionPadding2D
 
 
-def get_vgg_model():
+def get_vgg_model(preprocessing_params):
     vgg_old = tf.keras.applications.VGG19(
         input_shape=[None, None, 3],
         weights=None,
         include_top=False)
 
     images = tf.keras.Input(shape=[None, None, 3])
-    x = images
+    images = images[:, :, :, ::-1]
+    offset = tf.reshape(tf.constant(preprocessing_params.offset),
+                        shape=[1, 1, 1, 3])
+    scale = tf.reshape(tf.constant(preprocessing_params.scale),
+                       shape=[1, 1, 1, 3])
+    x = tf.math.divide_no_nan(images - offset, scale)
 
     for layer in vgg_old.layers[1:]:
         config = layer.get_config()
@@ -39,21 +44,21 @@ class StyleTransferNetwork(tf.keras.Model):
     ]
     _MSE_LOSS = tf.losses.MeanSquaredError(reduction='none')
 
-    def __init__(self, encoder_weights, **kwargs):
+    def __init__(self, preprocessing_params, encoder_weights, **kwargs):
         super(StyleTransferNetwork, self).__init__(**kwargs)
 
+        self.preprocessing_params = preprocessing_params
         self.encoder_weights = encoder_weights
-        self.encoder = StyleTransferNetwork._build_encoder(encoder_weights)
-        self.decoder = StyleTransferNetwork._build_decoder()
+        self.encoder = self._build_encoder()
+        self.decoder = self._build_decoder()
         self.adain = AdaptiveInstanceNormalization()
 
-    @staticmethod
-    def _build_encoder(encoder_weights):
-        base_model = get_vgg_model()
-        base_model.load_weights(encoder_weights)
+    def _build_encoder(self):
+        base_model = get_vgg_model(self.preprocessing_params)
+        base_model.load_weights(self.encoder_weights)
 
         logging.info('Initialized encoder with weights from {}'.format(
-            encoder_weights))
+            self.encoder_weights))
 
         encoder = tf.keras.Model(
             inputs=base_model.inputs,
@@ -66,8 +71,7 @@ class StyleTransferNetwork(tf.keras.Model):
         encoder.trainable = False
         return encoder
 
-    @staticmethod
-    def _build_decoder():
+    def _build_decoder(self):
         conv2d_valid_padding = functools.partial(tf.keras.layers.Conv2D,
                                                  kernel_size=(3, 3),
                                                  strides=1,
