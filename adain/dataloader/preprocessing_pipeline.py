@@ -33,13 +33,7 @@ class PreprocessingPipeline:
         return tf.expand_dims(image, axis=0)
 
     def denormalize(self, images):
-        pixel_mins = tf.reduce_min(images, axis=[1, 2, 3])
-        pixel_maxs = tf.reduce_max(images, axis=[1, 2, 3])
-        pixel_range = pixel_maxs - pixel_mins
-
-        images = 255.0 * (images - pixel_mins) / pixel_range
-        images = tf.clip_by_value(images, 0, 255)
-
+        images = tf.clip_by_value(images, 0.0, 255.0)
         return tf.cast(images, dtype=tf.uint8)
 
     def __call__(self, sample):
