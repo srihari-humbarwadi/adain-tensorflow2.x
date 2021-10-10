@@ -46,9 +46,9 @@ imshow(result, figsize=(20, 10))
 ### Results
 ![1.png](/assets/images/1.png)
 ![2.png](/assets/images/2.png)
-![1.png](/assets/images/3.png)
-![2.png](/assets/images/4.png)
-![1.png](/assets/images/5.png)
+![3.png](/assets/images/3.png)
+![4.png](/assets/images/4.png)
+![5.png](/assets/images/5.png)
 
 ##### Controlling Content-Style tradeoff by varying alpha
 <table>
