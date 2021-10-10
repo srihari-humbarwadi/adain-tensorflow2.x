@@ -66,7 +66,9 @@ def main(_):
             name='content_images',
             dtype=tf.float32),
         'alpha': tf.TensorSpec(
-            shape=[], name='alpha', dtype=tf.float32)
+            shape=[], name='alpha', dtype=tf.float32),
+        'resize': tf.TensorSpec(
+            shape=[], name='resize', dtype=tf.bool)
     }
 
     logging.debug('Signature for serving_default :\n{}'.format(
@@ -74,15 +76,20 @@ def main(_):
 
     inference_model._saved_model_inputs_spec = input_signature
 
-    preprocessing_pipeline = PreprocessingPipeline(params=params,
-                                                   is_validation_dataset=True)
+    preprocessing_pipeline = PreprocessingPipeline(
+        params=params,
+        is_validation_dataset=True)
 
     @tf.function
     def serving_fn(sample):
-        style_images = preprocessing_pipeline.inference_pipeline(
-            sample['style_images'])
-        content_images = preprocessing_pipeline.inference_pipeline(
-            sample['content_images'])
+        style_images = sample['style_images']
+        content_images = sample['content_images']
+
+        if sample['resize']:
+            style_images = preprocessing_pipeline.inference_pipeline(
+                images=style_images)
+            content_images = preprocessing_pipeline.inference_pipeline(
+                images=content_images)
 
         stylized_images = inference_model.call((
             style_images,
