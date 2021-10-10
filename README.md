@@ -56,7 +56,6 @@ imshow(result, figsize=(20, 10))
     <td valign="top"><img src="assets/gifs/chicago_asheville.gif"></td>
     <td valign="top"><img src="assets/gifs/lenna_en_campo_gris.gif"></td>
     <td valign="top"><img src="assets/gifs/avril_impronte_d_artista.gif"></td>
-    <td valign="top"><img src="assets/image_4348.png"></td>
   </tr>
  </table>
 </br>
