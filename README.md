@@ -1,4 +1,5 @@
 # AdaIN
+### This work is supported by Cloud TPUs from Google's TPU Research Cloud (TRC)
 
 ## Getting started
  - Download the coco2017 and wikiart datasets
